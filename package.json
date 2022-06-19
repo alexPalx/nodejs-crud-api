@@ -1,0 +1,29 @@
+{
+  "name": "nodejs-crud-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start:prod": "node server.js",
+    "start:dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexPalx/nodejs-crud-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexPalx/nodejs-crud-api/issues"
+  },
+  "homepage": "https://github.com/alexPalx/nodejs-crud-api#readme",
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  }
+}
