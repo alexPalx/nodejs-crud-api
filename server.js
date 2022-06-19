@@ -149,6 +149,12 @@ const server = createServer((req, res) => {
                 break;
 
             case 'POST':
+                if (!req.url === '/api/users' || !req.url === '/api/users/') {
+                    res.writeHead(404, 'Content-type', 'application/json');
+                    res.end(JSON.stringify({ message: 'Invalid URL' }));
+                    return;
+                }
+                
                 req.on('data', chunk => {
                     body += chunk.toString();
                 });
