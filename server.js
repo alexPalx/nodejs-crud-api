@@ -1,5 +1,8 @@
 import { createServer } from 'http';
 import { v4 as uuidv4, validate } from 'uuid';
+import dotenv from 'dotenv';
+
+dotenv.config()
 
 let database = [
     {
@@ -22,7 +25,7 @@ let database = [
     }
 ];
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 /**
  * If the URL doesn't match the pattern /api/users/..., then return a 404 error. Otherwise, return true
