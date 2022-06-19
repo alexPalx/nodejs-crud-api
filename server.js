@@ -25,6 +25,7 @@ const database = [
 const PORT = 5000;
 
 const server = createServer((req, res) => {
+    let body = '';
     switch (req.method) {
         case 'GET':
             // /api/users || /api/users/
@@ -61,8 +62,6 @@ const server = createServer((req, res) => {
             break;
 
         case 'POST':
-            let body = '';
-
             req.on('data', chunk => {
                 body += chunk.toString();
             });
@@ -84,6 +83,40 @@ const server = createServer((req, res) => {
 
                 res.writeHead(201, 'Content-type', 'application/json');
                 res.end(JSON.stringify(body));
+            });
+            break;
+
+        case 'PUT':
+            if (!req.url.match(/\/api\/users\/.+/)) {
+                res.writeHead(404, 'Content-type', 'text/html');
+                res.end('Error 404');
+                return;
+            }
+
+            const id = req.url.split('/')[3];
+            if (id.length === 0 || !validate(id)) {
+                res.writeHead(400, 'Content-type', 'application/json');
+                res.end(JSON.stringify({ message: 'Incorrect id' }));
+                return;
+            }
+
+            let userDatabaseId = database.findIndex(user => user.id === req.url.split('/')[3]);
+            if (userDatabaseId === -1) {
+                res.writeHead(404, 'Content-type', 'application/json');
+                    res.end(JSON.stringify({ message: 'User doesn\'t exist' }));
+                    return;
+            }
+
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+            req.on('end', () => {
+                body = JSON.parse(body);
+
+                database[userDatabaseId] = { ...database[userDatabaseId], ...body, id: database[userDatabaseId].id };
+                res.writeHead(200, 'Content-type', 'application/json');
+                res.end(JSON.stringify(database[userDatabaseId]));
+                return;
             });
             break;
 
