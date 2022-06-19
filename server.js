@@ -59,7 +59,34 @@ const server = createServer((req, res) => {
             res.writeHead(404, 'Content-type', 'text/html');
             res.end('Error 404');
             break;
-        
+
+        case 'POST':
+            let body = '';
+
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+            req.on('end', () => {
+                body = JSON.parse(body);
+
+                if (!body.username ||
+                    !body.age ||
+                    !body.hobbies ||
+                    !Array.isArray(body.hobbies)
+                ) {
+                    res.writeHead(400, 'Content-type', 'text/html');
+                    res.end('object must have properties: username: string, age: number, hobbies: array');
+                    return;
+                }
+
+                body = { ...body, id: uuidv4() };
+                database.push(body);
+
+                res.writeHead(201, 'Content-type', 'application/json');
+                res.end(JSON.stringify(body));
+            });
+            break;
+
         default:
             res.writeHead(404, 'Content-type', 'text/html');
             res.end('Error 404');
