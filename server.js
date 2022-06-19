@@ -1,7 +1,7 @@
 import { createServer } from 'http';
 import { v4 as uuidv4, validate } from 'uuid';
 
-const database = [
+let database = [
     {
         id: uuidv4(),
         username: 'Catherine',
@@ -26,6 +26,7 @@ const PORT = 5000;
 
 const server = createServer((req, res) => {
     let body = '';
+    let id;
     switch (req.method) {
         case 'GET':
             // /api/users || /api/users/
@@ -93,18 +94,17 @@ const server = createServer((req, res) => {
                 return;
             }
 
-            const id = req.url.split('/')[3];
+            id = req.url.split('/')[3];
             if (id.length === 0 || !validate(id)) {
                 res.writeHead(400, 'Content-type', 'application/json');
                 res.end(JSON.stringify({ message: 'Incorrect id' }));
                 return;
             }
 
-            let userDatabaseId = database.findIndex(user => user.id === req.url.split('/')[3]);
-            if (userDatabaseId === -1) {
+            if (database.findIndex(user => user.id === req.url.split('/')[3]) === -1) {
                 res.writeHead(404, 'Content-type', 'application/json');
-                    res.end(JSON.stringify({ message: 'User doesn\'t exist' }));
-                    return;
+                res.end(JSON.stringify({ message: 'User doesn\'t exist' }));
+                return;
             }
 
             req.on('data', chunk => {
@@ -118,6 +118,32 @@ const server = createServer((req, res) => {
                 res.end(JSON.stringify(database[userDatabaseId]));
                 return;
             });
+            break;
+
+        case 'DELETE':
+            if (!req.url.match(/\/api\/users\/.+/)) {
+                res.writeHead(404, 'Content-type', 'text/html');
+                res.end('Error 404');
+                return;
+            }
+
+            id = req.url.split('/')[3];
+            if (id.length === 0 || !validate(id)) {
+                res.writeHead(400, 'Content-type', 'application/json');
+                res.end(JSON.stringify({ message: 'Incorrect id' }));
+                return;
+            }
+
+            if (database.findIndex(user => user.id === req.url.split('/')[3]) === -1) {
+                res.writeHead(404, 'Content-type', 'application/json');
+                res.end(JSON.stringify({ message: 'User doesn\'t exist' }));
+                return;
+            }
+
+            database = database.filter(user => user.id !== id);
+
+            res.statusCode = 204;
+            res.end();
             break;
 
         default:
